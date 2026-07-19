@@ -6,6 +6,8 @@ import {
   resetData,
   saveData,
   uid,
+  type Degree,
+  type Experience,
   type ResumeData,
 } from "@/lib/resume-data";
 import { Download, Upload, RotateCcw, Plus, Trash2, Eye } from "lucide-react";
@@ -181,7 +183,7 @@ function SecretEditor() {
           <ListEditor
             items={data.degrees}
             onChange={(degrees) => update({ degrees })}
-            newItem={() => ({ id: uid(), school: "", degree: "", field: "", years: "" })}
+            newItem={(): Degree => ({ id: uid(), school: "", degree: "", field: "", years: "", detail: "" })}
             render={(item, set) => (
               <div className="space-y-2">
                 <div className="grid grid-cols-2 gap-2">
