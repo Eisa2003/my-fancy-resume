@@ -160,7 +160,7 @@ function SecretEditor() {
           <ListEditor
             items={data.experiences}
             onChange={(experiences) => update({ experiences })}
-            newItem={() => ({ id: uid(), role: "", company: "", years: "", description: "" })}
+            newItem={(): Experience => ({ id: uid(), role: "", company: "", years: "", location: "", description: "" })}
             render={(item, set) => (
               <div className="space-y-2">
                 <div className="grid grid-cols-2 gap-2">
