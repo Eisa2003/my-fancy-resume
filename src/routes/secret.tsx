@@ -1,16 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   DEFAULT_DATA,
   loadData,
   resetData,
   saveData,
+  publishCloud,
+  fetchCloud,
   uid,
   type Degree,
   type Experience,
   type ResumeData,
 } from "@/lib/resume-data";
-import { Download, Upload, RotateCcw, Plus, Trash2, Eye } from "lucide-react";
+import { Download, Upload, RotateCcw, Plus, Trash2, Eye, Cloud, CloudDownload } from "lucide-react";
 
 export const Route = createFileRoute("/secret")({
   component: SecretEditor,
