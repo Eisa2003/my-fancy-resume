@@ -28,12 +28,38 @@ function SecretEditor() {
   const [data, setData] = useState<ResumeData>(() =>
     typeof window === "undefined" ? DEFAULT_DATA : loadData(),
   );
+  const [publishState, setPublishState] = useState<"idle" | "publishing" | "done" | "error">("idle");
+  const [publishMsg, setPublishMsg] = useState<string>("");
   const fileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    // Pull latest cloud copy on open so the editor matches what visitors see.
+    fetchCloud().then((cloud) => {
+      if (cloud) {
+        setData(cloud);
+        saveData(cloud);
+      }
+    });
+  }, []);
 
   const update = (patch: Partial<ResumeData>) => {
     const next = { ...data, ...patch };
     setData(next);
     saveData(next);
+  };
+
+  const publish = async () => {
+    setPublishState("publishing");
+    setPublishMsg("");
+    try {
+      await publishCloud(data);
+      setPublishState("done");
+      setPublishMsg("Published! Visitors will see this on refresh.");
+      setTimeout(() => setPublishState("idle"), 3000);
+    } catch (e) {
+      setPublishState("error");
+      setPublishMsg(e instanceof Error ? e.message : "Failed to publish");
+    }
   };
 
   const exportJson = () => {
