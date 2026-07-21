@@ -65,7 +65,7 @@ export type ResumeData = {
 };
 
 export const DEFAULT_DATA: ResumeData = {
-  name: "Your Name",
+  name: "Eisa Samiullah Chaudhary",
   title: "Researcher · Engineer · Maker",
   tagline: "Building thoughtful things at the intersection of software and science.",
   location: "Somewhere on Earth",
