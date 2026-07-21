@@ -153,7 +153,10 @@ export const DEFAULT_DATA: ResumeData = {
   ],
 };
 
+import { supabase } from "@/integrations/supabase/client";
+
 const STORAGE_KEY = "resume-data-v1";
+const CLOUD_ID = "main";
 
 export function loadData(): ResumeData {
   if (typeof window === "undefined") return DEFAULT_DATA;
@@ -176,23 +179,47 @@ export function resetData() {
   window.dispatchEvent(new Event("resume-data-updated"));
 }
 
-export function useResumeData(): [ResumeData, (d: ResumeData) => void] {
+export async function fetchCloud(): Promise<ResumeData | null> {
+  const { data, error } = await supabase
+    .from("resume")
+    .select("data")
+    .eq("id", CLOUD_ID)
+    .maybeSingle();
+  if (error || !data) return null;
+  return { ...DEFAULT_DATA, ...(data.data as ResumeData) };
+}
+
+export async function publishCloud(data: ResumeData): Promise<void> {
+  const { error } = await supabase
+    .from("resume")
+    .upsert({
+      id: CLOUD_ID,
+      data: data as unknown as Record<string, unknown>,
+      updated_at: new Date().toISOString(),
+    });
+  if (error) throw error;
+}
+
+export function useResumeData(): [ResumeData, boolean] {
   const [data, setData] = useState<ResumeData>(DEFAULT_DATA);
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
-    setData(loadData());
+    let cancelled = false;
+    (async () => {
+      const cloud = await fetchCloud();
+      if (cancelled) return;
+      if (cloud) setData(cloud);
+      else setData(loadData());
+      setLoading(false);
+    })();
     const handler = () => setData(loadData());
     window.addEventListener("resume-data-updated", handler);
-    window.addEventListener("storage", handler);
     return () => {
+      cancelled = true;
       window.removeEventListener("resume-data-updated", handler);
-      window.removeEventListener("storage", handler);
     };
   }, []);
-  const update = (d: ResumeData) => {
-    saveData(d);
-    setData(d);
-  };
-  return [data, update];
+  return [data, loading];
 }
 
 export function uid() {
