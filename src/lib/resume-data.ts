@@ -194,7 +194,7 @@ export async function publishCloud(data: ResumeData): Promise<void> {
     .from("resume")
     .upsert({
       id: CLOUD_ID,
-      data: data as unknown as Record<string, unknown>,
+      data: JSON.parse(JSON.stringify(data)),
       updated_at: new Date().toISOString(),
     });
   if (error) throw error;
