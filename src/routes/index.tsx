@@ -7,10 +7,16 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const [data] = useResumeData();
+  const [data, loading] = useResumeData();
 
   return (
     <main className="min-h-screen">
+      {loading && (
+        <div className="fixed left-1/2 top-4 z-50 -translate-x-1/2 rounded-full border border-border bg-card/80 px-4 py-1.5 text-xs text-muted-foreground shadow-sm backdrop-blur">
+          <span className="mr-2 inline-block h-2 w-2 animate-pulse rounded-full bg-accent" />
+          Loading latest from cloud…
+        </div>
+      )}
       <div className="mx-auto max-w-5xl px-6 py-16 md:px-10 md:py-24">
         {/* HERO */}
         <section className="grid grid-cols-1 gap-10 md:grid-cols-[auto_1fr] md:items-center">
