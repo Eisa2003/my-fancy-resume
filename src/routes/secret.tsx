@@ -100,6 +100,19 @@ function SecretEditor() {
               <Eye className="h-4 w-4" /> View
             </Link>
             <button
+              onClick={async () => {
+                const cloud = await fetchCloud();
+                if (cloud) {
+                  setData(cloud);
+                  saveData(cloud);
+                }
+              }}
+              className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-sm hover:bg-secondary"
+              title="Load the currently-published version from the cloud"
+            >
+              <CloudDownload className="h-4 w-4" /> Pull
+            </button>
+            <button
               onClick={exportJson}
               className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-sm hover:bg-secondary"
             >
@@ -119,6 +132,14 @@ function SecretEditor() {
               onChange={(e) => e.target.files?.[0] && importJson(e.target.files[0])}
             />
             <button
+              onClick={publish}
+              disabled={publishState === "publishing"}
+              className="inline-flex items-center gap-1.5 rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-accent-foreground hover:opacity-90 disabled:opacity-60"
+            >
+              <Cloud className="h-4 w-4" />
+              {publishState === "publishing" ? "Publishing…" : "Publish to Cloud"}
+            </button>
+            <button
               onClick={() => {
                 if (confirm("Reset everything to defaults?")) {
                   resetData();
@@ -134,14 +155,28 @@ function SecretEditor() {
       </div>
 
       <div className="mx-auto max-w-4xl space-y-10 px-6 py-10">
+        {publishMsg && (
+          <div
+            className={`rounded-lg border p-3 text-sm ${
+              publishState === "error"
+                ? "border-destructive/40 bg-destructive/10 text-destructive"
+                : "border-accent/40 bg-accent/10 text-foreground"
+            }`}
+          >
+            {publishMsg}
+          </div>
+        )}
         <Note>
-          Changes save automatically in your browser. Use <b>Export</b> to download a{" "}
-          <code>resume-data.json</code> backup, and <b>Import</b> to restore it.
+          Edits save to your browser as you type. Click <b>Publish to Cloud</b> to make them
+          visible to everyone on the live site — including other devices. Use <b>Import</b> to
+          load a <code>resume-data.json</code> file, then Publish to push it live. <b>Pull</b>
+          re-loads the currently published version.
           <br />
-          For permanent images: drop files into <code>public/images/</code> in your
-          GitHub repo, then reference them here as <code>/images/your-file.jpg</code>.
-          You can also upload images below (they'll be embedded directly in the data).
+          For images you'd rather keep in the repo, drop them in <code>public/images/</code> and
+          reference them as <code>/images/your-file.jpg</code>. Uploads here get embedded
+          directly in the data.
         </Note>
+
 
         <Group title="Profile">
           <Field label="Name" value={data.name} onChange={(v) => update({ name: v })} />
